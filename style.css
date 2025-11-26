@@ -19,7 +19,7 @@ nav a:hover { color: #ffd700; }
 #hero .cta { display: inline-block; padding: 12px 32px; background: #222; color: #ffd700;
     text-decoration: none; border-radius: 30px; margin-top: 20px; font-weight: bold; }
 
-section { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+section { max-width: 800px; margin: 40px auto; padding: 0 20px; } 
 h2 { color: #536dfe; }
 .pricing-box {
     background: #fff; border-radius: 15px; box-shadow: 0 2px 18px 0 #e8e8e8; padding: 30px; text-align: center;
