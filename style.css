@@ -1,6 +1,17 @@
-body {
+/* body {
     margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f7f8fa; color: #222;
+} */
+
+body {
+  background-image: url('BACKGROUNG.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0;
+  min-height: 100vh;
 }
+
+
 header nav {
     display: flex; align-items: center; justify-content: space-between;
     background: #222; padding: 10px 30px;
@@ -103,13 +114,14 @@ footer { text-align: center; padding: 25px 0 10px; color: #888; font-size: 0.92e
 .emoji-picker {
         position: fixed;
     background: white;
+    
 }
 
 .fb-toolbar {
     margin-top: 12px;
     display: flex;
     gap: 8px;
-    align-items: center;
+    justify-content: space-around;
 }
 .emoji-btn {
     background: none;
@@ -142,7 +154,51 @@ footer { text-align: center; padding: 25px 0 10px; color: #888; font-size: 0.92e
     display: contents;
 }
 
+.editor-btn {
+    border-radius: 20%;
+    cursor: pointer;
+    height: 34px;
+    width: 34px;
+}
+
+#get-location{
+    cursor: pointer;
+    height: 34px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
   
+.editor-area {
+  border: 2px solid blue;
+  height: 45px;
+  padding: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  outline: none;
+  border-radius: 5px;
+  animation: fadeInText 1s ease forwards;
+}
+
+.editor-area:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 8px rgba(0, 86, 179, 0.6);
+  background-color: #f0f8ff;
+}
+
+@keyframes fadeInText {
+  from {
+    opacity: 0.5;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
 /* Responsive */
 @media (max-width: 600px) {
     nav ul { flex-direction: column; display: none; background: #222; position: absolute; top: 55px; right: 20px; padding: 20px 40px; border-radius: 10px; }

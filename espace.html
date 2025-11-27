@@ -36,15 +36,18 @@
             </label>
             </div>
         <div class="fb-post-area">
-            <textarea id="post-content" placeholder="Exprimez-vous..." required></textarea>
+           <div id="editor" contenteditable="true" class="editor-area">
+    Exprimez-vous...
+</div>
             <div class="fb-toolbar">
                 <button type="button" id="add-photo" title="Ajouter photo/vidéo">
-                    <span style="font-size:1.4em;">📷</span>
+                    <span style="font-size:1.4em;">📂</span>
                 </button>
                 <input type="file" id="media-input" accept="image/*,video/*" multiple style="display:none;">
-                <button type="button" class="editor-btn" data-action="bold" title="Gras"><b>B</b></button>
-                <button type="button" class="editor-btn" data-action="italic" title="Italique"><i>I</i></button>
-                <button type="button" class="editor-btn" data-action="underline" title="Souligné"><u>U</u></button>
+                <button type="button"  class="editor-btn" data-action="bold" title="Gras"><b>𝐀</b></button>
+                <button type="button" class="editor-btn" data-action="italic" title="Italique"><i>𝘈</i></button>
+                <button type="button"  class="editor-btn" data-action="underline" title="Souligné"><u>U</u></button>
+  
                 <div class="emoji-section" style="display:inline-block; position:relative;">
                     <button id="add-emoji" class="emoji-btn" type="button" title="Ajouter un emoji">😊</button>
                     <div id="emoji-picker" class="emoji-picker"></div>
@@ -64,9 +67,7 @@
     <div id="publications"></div>
 </section>
 
-<footer>
-    <p>&copy; 2025 READ.ME – Espace personnel utilisateur.</p>
-</footer>
+
 
 <script>
 // Affiche le nom utilisateur
@@ -137,27 +138,14 @@ document.addEventListener('click', function(e){
 // ----- FIN NOUVEAU CODE EMOJIS -----
 
 // -------- Mini éditeur : Gras, Italique, Souligné ---------
-document.querySelectorAll('.editor-btn').forEach(btn => {
-    btn.onclick = function() {
-        const action = btn.getAttribute('data-action');
-        const textarea = document.getElementById('post-content');
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const selected = textarea.value.substring(start, end);
-
-        let before = textarea.value.substring(0, start);
-        let after = textarea.value.substring(end);
-
-        let formatted = selected;
-        if(action === "bold") formatted = `**${selected}**`;
-        if(action === "italic") formatted = `*${selected}*`;
-        if(action === "underline") formatted = `<u>${selected}</u>`;
-
-        textarea.value = before + formatted + after;
-        textarea.focus();
-        textarea.selectionStart = textarea.selectionEnd = start + formatted.length;
-    }
+document.querySelectorAll(".editor-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const action = btn.dataset.action; 
+        document.execCommand(action, false, null); // applique gras/italique/souligné
+        document.getElementById("editor").focus();
+    });
 });
+
 // ----------------------------------------------------------
 
 // ----------- Localisation utilisateur ----------------------
