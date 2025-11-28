@@ -172,14 +172,17 @@ footer { text-align: center; padding: 25px 0 10px; color: #888; font-size: 0.92e
   
 .editor-area {
   border: 2px solid blue;
-  height: 45px;
+  /* height: 45px;  <-- on supprime cette ligne */
+  min-height: 45px;              /* hauteur de départ, mais peut grandir */
   padding: 8px;
   font-size: 16px;
   transition: border-color 0.3s ease, box-shadow 0.3s ease;
   outline: none;
   border-radius: 5px;
   animation: fadeInText 1s ease forwards;
+  box-sizing: border-box;        /* pour que le padding soit bien pris en compte */
 }
+
 
 .editor-area:focus {
   border-color: #0056b3;
@@ -197,6 +200,79 @@ footer { text-align: center; padding: 25px 0 10px; color: #888; font-size: 0.92e
     transform: translateY(0);
   }
 }
+
+/* Post normal (commentaires activés) */
+.post {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+
+
+
+/* Post par défaut (public, commentaires activés) */
+.post {
+     min-height: 45px;  
+    background-color: #ffffff;      /* fond blanc */
+    color: #000000;                 /* texte noir */
+    border-radius: 8px;             /* coins arrondis légers */
+    box-sizing: border-box;
+    padding: 12px 16px;             /* marge interne */
+    margin-bottom: 16px;            /* espace entre posts */
+    border: 1px solid #e0e0e0;      /* petite bordure claire */
+    transition: box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Post avec commentaires désactivés => fond gris + texte plus clair */
+.post.comments-disabled {
+    background-color: #f0f0f0;      /* gris clair */
+    color: #666666;                 /* texte gris */
+}
+
+/* Post privé => ajoute un shadow pour le mettre en valeur */
+.post.post-private {
+    box-shadow: 1px 3px 11px 9px #000000
+ /* ombre autour du post */
+}
+
+/* Bouton Publier (style de base, si tu n’as rien encore) */
+.fb-publish {
+    background-color: #1877f2;      /* bleu type réseau social */
+    color: #ffffff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: box-shadow 0.2s ease, transform 0.1s ease, background-color 0.2s ease;
+}
+
+/* Bouton Publier quand visibilité = privé => shadow pour le bouton */
+.fb-publish.btn-private {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* (optionnel) effet hover global sur le bouton */
+.fb-publish:hover {
+    background-color: #145bcc;
+    transform: translateY(-1px);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Responsive */

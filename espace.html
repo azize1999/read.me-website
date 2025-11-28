@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Mon espace personnel | READ.ME</title>
-    <link rel="stylesheet" href="style.css"> <!-- À garder si tu veux styliser, sinon ignore -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>   
@@ -59,15 +59,10 @@
         
         <div id="media-preview"></div>
 
-       
-           
-
         <button type="submit" class="fb-publish">Publier</button>
     </form>
     <div id="publications"></div>
 </section>
-
-
 
 <script>
 // Affiche le nom utilisateur
@@ -100,7 +95,8 @@ document.getElementById('media-input').addEventListener('change', function() {
 const emojis = ["😃","😂","😍","🥳","😢","🥰","😭","😅","😡","👍","🙏","👏","💡","🎉","🔥","❤️"];
 const emojiPicker = document.getElementById('emoji-picker');
 const addEmojiBtn = document.getElementById('add-emoji');
-const textarea = document.getElementById('post-content');
+// on cible maintenant le div contenteditable
+const textarea = document.getElementById('editor');
 
 // Injection unique des emojis dans le picker
 function injectEmojis(picker, textareaTarget) {
@@ -109,7 +105,8 @@ function injectEmojis(picker, textareaTarget) {
             let span = document.createElement('span');
             span.textContent = emoji;
             span.onclick = function() {
-                textareaTarget.value += emoji;
+                // on ajoute l'emoji dans le contenu HTML du div
+                textareaTarget.innerHTML += emoji;
                 picker.style.display = "none";
                 textareaTarget.focus();
             };
@@ -141,12 +138,10 @@ document.addEventListener('click', function(e){
 document.querySelectorAll(".editor-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const action = btn.dataset.action; 
-        document.execCommand(action, false, null); // applique gras/italique/souligné
+        document.execCommand(action, false, null);
         document.getElementById("editor").focus();
     });
 });
-
-// ----------------------------------------------------------
 
 // ----------- Localisation utilisateur ----------------------
 let userPosition = "";
@@ -169,7 +164,8 @@ document.getElementById('get-location').onclick = function() {
 // ----------- Publication enrichie (avec tous les paramètres) -------------
 document.getElementById('post-form').onsubmit = function(e) {
     e.preventDefault();
-    let post = document.getElementById('post-content').value;
+    // on récupère maintenant le contenu du div contenteditable
+    let post = document.getElementById('editor').innerHTML;
     let mediaInput = document.getElementById('media-input');
     let div = document.createElement('div');
     div.className = "post";
@@ -203,9 +199,25 @@ document.getElementById('post-form').onsubmit = function(e) {
         loc.innerHTML = `📍 ${userPosition}`;
         div.appendChild(loc);
     }
+
     // Ajout paramètres de publication
     let visibility = document.getElementById('visibility').value;
     let enableComments = document.getElementById('enable-comments').checked;
+
+    // si commentaires désactivés => post gris
+    if (!enableComments) {
+        div.classList.add('comments-disabled');
+    }
+
+    // si visibilité privée => shadow sur post + bouton
+    const publishBtn = document.querySelector('.fb-publish');
+    if (visibility === "private") {
+        div.classList.add('post-private');
+        publishBtn.classList.add('btn-private');
+    } else {
+        publishBtn.classList.remove('btn-private');
+    }
+
     let info = document.createElement('div');
     info.className = "post-meta";
     info.innerHTML = `Visibilité: <b>${visibility}</b> | Commentaires: <b>${enableComments ? "activés" : "désactivés"}</b>`;
@@ -216,9 +228,11 @@ document.getElementById('post-form').onsubmit = function(e) {
     document.getElementById('media-preview').innerHTML = "";
     document.getElementById('user-location').textContent = "";
     userPosition = "";
+
+    // remettre éventuellement un placeholder dans l’éditeur
+    document.getElementById('editor').innerHTML = "Exprimez-vous...";
 };
 // -------------------------------------------------------------------
-
 </script>
 </body>
 </html>
