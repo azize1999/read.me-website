@@ -17,6 +17,14 @@
     
 <section>
     <h2>Bienvenue <span id="username"></span> dans votre espace personnel</h2>
+    
+    <!-- Theme Switcher -->
+    <div id="theme-switcher" style="display: flex; justify-content: center; gap: 15px; margin-bottom: 20px;">
+        <button id="theme-dark" class="theme-btn" title="Mode Nuit">🌙 Noir</button>
+        <button id="theme-light" class="theme-btn" title="Mode Jour">☀️ Blanc</button>
+        <button id="theme-default" class="theme-btn" title="Défaut">🖼️ Défaut</button>
+    </div>
+
     <div class="notification">
         🎉 Vous pouvez partager vos conseils, publications et médias !
         Commencez à monétiser votre espace à partir de 14,99 € en ouvrant l’accès à vos clients.
@@ -51,7 +59,8 @@
                 <div class="emoji-section" style="display:inline-block; position:relative;">
                     <button id="add-emoji" class="emoji-btn" type="button" title="Ajouter un emoji">😊</button>
                     <div id="emoji-picker" class="emoji-picker"></div>
-                     <button type="button" id="get-location">Ajouter ma position 📍</button>
+                     <button type="button" id="get-location">Ajouter un lieu 📍</button>
+                     <input type="text" id="location-input" placeholder="Lieu ?" style="display:none; border:none; border-bottom:1px solid #ccc; outline:none; margin-left:8px;">
             <span id="user-location" style="margin-left:8px;"></span>
                 </div>
             </div>
@@ -64,175 +73,9 @@
     <div id="publications"></div>
 </section>
 
-<script>
-// Affiche le nom utilisateur
-document.getElementById('username').textContent = localStorage.getItem('currentUser') || "";
+    <div id="publications"></div>
+</section>
 
-// Bouton photo : déclenche input file
-document.getElementById('add-photo').onclick = () => document.getElementById('media-input').click();
-
-// Aperçu images/vidéos
-document.getElementById('media-input').addEventListener('change', function() {
-    const preview = document.getElementById('media-preview');
-    preview.innerHTML = "";
-    for(const file of this.files) {
-        let el;
-        if(file.type.startsWith("image")) {
-            el = document.createElement('img');
-        } else if(file.type.startsWith("video")) {
-            el = document.createElement('video');
-            el.controls = true;
-        }
-        if(el){
-            el.src = URL.createObjectURL(file);
-            preview.appendChild(el);
-        }
-    }
-});
-
-// ----- NOUVEAU CODE EMOJIS -----
-// Liste d'emojis pour le picker
-const emojis = ["😃","😂","😍","🥳","😢","🥰","😭","😅","😡","👍","🙏","👏","💡","🎉","🔥","❤️"];
-const emojiPicker = document.getElementById('emoji-picker');
-const addEmojiBtn = document.getElementById('add-emoji');
-// on cible maintenant le div contenteditable
-const textarea = document.getElementById('editor');
-
-// Injection unique des emojis dans le picker
-function injectEmojis(picker, textareaTarget) {
-    if (!picker.innerHTML) {
-        emojis.forEach(emoji => {
-            let span = document.createElement('span');
-            span.textContent = emoji;
-            span.onclick = function() {
-                // on ajoute l'emoji dans le contenu HTML du div
-                textareaTarget.innerHTML += emoji;
-                picker.style.display = "none";
-                textareaTarget.focus();
-            };
-            picker.appendChild(span);
-        });
-    }
-}
-
-// Affiche ou masque le picker
-addEmojiBtn.onclick = function(e) {
-    e.stopPropagation();
-    if (emojiPicker.style.display === "block") {
-        emojiPicker.style.display = "none";
-    } else {
-        injectEmojis(emojiPicker, textarea);
-        emojiPicker.style.display = "block";
-    }
-};
-
-// Ferme le picker si clic à l'extérieur
-document.addEventListener('click', function(e){
-    if(!emojiPicker.contains(e.target) && e.target !== addEmojiBtn) {
-        emojiPicker.style.display = "none";
-    }
-});
-// ----- FIN NOUVEAU CODE EMOJIS -----
-
-// -------- Mini éditeur : Gras, Italique, Souligné ---------
-document.querySelectorAll(".editor-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        const action = btn.dataset.action; 
-        document.execCommand(action, false, null);
-        document.getElementById("editor").focus();
-    });
-});
-
-// ----------- Localisation utilisateur ----------------------
-let userPosition = "";
-document.getElementById('get-location').onclick = function() {
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(function(pos){
-            userPosition = `Lat: ${pos.coords.latitude.toFixed(4)}, Lng: ${pos.coords.longitude.toFixed(4)}`;
-            document.getElementById('user-location').textContent = userPosition;
-        }, function(){
-            userPosition = "Localisation refusée ou indisponible";
-            document.getElementById('user-location').textContent = userPosition;
-        });
-    } else {
-        userPosition = "Non supporté";
-        document.getElementById('user-location').textContent = userPosition;
-    }
-};
-// ----------------------------------------------------------
-
-// ----------- Publication enrichie (avec tous les paramètres) -------------
-document.getElementById('post-form').onsubmit = function(e) {
-    e.preventDefault();
-    // on récupère maintenant le contenu du div contenteditable
-    let post = document.getElementById('editor').innerHTML;
-    let mediaInput = document.getElementById('media-input');
-    let div = document.createElement('div');
-    div.className = "post";
-    
-    // Convertir le markdown simple en HTML
-    post = post.replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>");
-    post = post.replace(/\*([^*]+)\*/g, "<i>$1</i>");
-    post = post.replace(/<u>(.+?)<\/u>/g, "<u>$1</u>");
-    div.innerHTML = post;
-    
-    // Ajout médias
-    if(mediaInput.files.length > 0) {
-        for(let file of mediaInput.files){
-            let el;
-            if(file.type.startsWith("image")){
-                el = document.createElement('img');
-            } else if(file.type.startsWith("video")){
-                el = document.createElement('video');
-                el.controls = true;
-            }
-            if(el){
-                el.src = URL.createObjectURL(file);
-                div.appendChild(el);
-            }
-        }
-    }
-    // Ajout localisation
-    if(userPosition) {
-        let loc = document.createElement('div');
-        loc.className = "post-location";
-        loc.innerHTML = `📍 ${userPosition}`;
-        div.appendChild(loc);
-    }
-
-    // Ajout paramètres de publication
-    let visibility = document.getElementById('visibility').value;
-    let enableComments = document.getElementById('enable-comments').checked;
-
-    // si commentaires désactivés => post gris
-    if (!enableComments) {
-        div.classList.add('comments-disabled');
-    }
-
-    // si visibilité privée => shadow sur post + bouton
-    const publishBtn = document.querySelector('.fb-publish');
-    if (visibility === "private") {
-        div.classList.add('post-private');
-        publishBtn.classList.add('btn-private');
-    } else {
-        publishBtn.classList.remove('btn-private');
-    }
-
-    let info = document.createElement('div');
-    info.className = "post-meta";
-    info.innerHTML = `Visibilité: <b>${visibility}</b> | Commentaires: <b>${enableComments ? "activés" : "désactivés"}</b>`;
-    div.appendChild(info);
-
-    document.getElementById('publications').prepend(div);
-    this.reset();
-    document.getElementById('media-preview').innerHTML = "";
-    document.getElementById('user-location').textContent = "";
-    userPosition = "";
-
-    // remettre éventuellement un placeholder dans l’éditeur
-    document.getElementById('editor').innerHTML = "Exprimez-vous...";
-};
-// -------------------------------------------------------------------
-</script>
+<script src="script.js"></script>
 </body>
 </html>
