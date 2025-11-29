@@ -166,6 +166,24 @@ if (document.getElementById('post-form')) {
         };
     }
 
+    // ----------- Avatar Upload -------------
+    const avatarInput = document.getElementById('avatar-input');
+    const currentUserAvatar = document.getElementById('current-user-avatar');
+    let userAvatarUrl = null;
+
+    if (currentUserAvatar && avatarInput) {
+        currentUserAvatar.onclick = () => avatarInput.click();
+        avatarInput.onchange = function () {
+            if (this.files && this.files[0]) {
+                userAvatarUrl = URL.createObjectURL(this.files[0]);
+                currentUserAvatar.innerHTML = "";
+                currentUserAvatar.style.backgroundImage = `url('${userAvatarUrl}')`;
+                currentUserAvatar.style.backgroundSize = "cover";
+                currentUserAvatar.style.backgroundPosition = "center";
+            }
+        };
+    }
+
     // ----------- Publication enrichie -------------
     const postForm = document.getElementById('post-form');
     if (postForm) {
@@ -176,11 +194,32 @@ if (document.getElementById('post-form')) {
             let div = document.createElement('div');
             div.className = "post";
 
-            // Header (Avatar + Nom)
+            // Header (Avatar + Infos)
             let header = document.createElement('div');
             header.className = "post-header";
             let username = localStorage.getItem('currentUser') || "Utilisateur";
-            header.innerHTML = `<div class="post-avatar">👤</div> <span>${username}</span>`;
+
+            let avatarHtml = `<div class="post-avatar">👤</div>`;
+            if (userAvatarUrl) {
+                avatarHtml = `<div class="post-avatar" style="background-image: url('${userAvatarUrl}'); background-size: cover; background-position: center;"></div>`;
+            }
+
+            // Préparation des infos méta (Localisation + Visibilité) - AU-DESSUS du nom
+            let metaInfo = "";
+            if (userPosition) {
+                metaInfo += `📍 ${userPosition} `;
+            }
+            let visibility = document.getElementById('visibility').value;
+            let visibilityIcon = visibility === "private" ? "🔒" : "🌍";
+            metaInfo += `${metaInfo ? "• " : ""}${visibilityIcon}`;
+
+            header.innerHTML = `
+                ${avatarHtml}
+                <div class="post-info">
+                    <span class="post-details">${metaInfo}</span>
+                    <span class="post-author">${username}</span>
+                </div>
+            `;
             div.appendChild(header);
 
             // Contenu du post
@@ -210,16 +249,8 @@ if (document.getElementById('post-form')) {
                     }
                 }
             }
-            // Ajout localisation
-            if (userPosition) {
-                let loc = document.createElement('div');
-                loc.className = "post-location";
-                loc.innerHTML = `📍 ${userPosition}`;
-                div.appendChild(loc);
-            }
 
             // Ajout paramètres de publication
-            let visibility = document.getElementById('visibility').value;
             let enableComments = document.getElementById('enable-comments').checked;
 
             if (!enableComments) {
@@ -234,10 +265,65 @@ if (document.getElementById('post-form')) {
                 publishBtn.classList.remove('btn-private');
             }
 
-            let info = document.createElement('div');
-            info.className = "post-meta";
-            info.innerHTML = `Visibilité: <b>${visibility}</b> | Commentaires: <b>${enableComments ? "activés" : "désactivés"}</b>`;
-            div.appendChild(info);
+            // --- REACTION BAR ---
+            let actionsDiv = document.createElement('div');
+            actionsDiv.className = "post-actions";
+            actionsDiv.innerHTML = `
+                <button class="action-btn like-btn">👍 J'aime <span class="count">0</span></button>
+                <button class="action-btn love-btn">❤️ J'adore <span class="count">0</span></button>
+                <button class="action-btn haha-btn">😂 Haha <span class="count">0</span></button>
+                <button class="action-btn sad-btn">😢 Triste <span class="count">0</span></button>
+                <button class="action-btn angry-btn">😡 Grrr <span class="count">0</span></button>
+                <button class="action-btn clap-btn">👏 Bravo <span class="count">0</span></button>
+            `;
+            div.appendChild(actionsDiv);
+
+            // Logic Reactions
+            actionsDiv.querySelectorAll('.action-btn').forEach(btn => {
+                btn.onclick = function () {
+                    let countSpan = this.querySelector('.count');
+                    let count = parseInt(countSpan.textContent);
+                    count++;
+                    countSpan.textContent = count;
+                    this.style.color = "#1877f2"; // Highlight color
+                    this.style.fontWeight = "bold";
+                };
+            });
+
+            // --- COMMENT SECTION ---
+            if (enableComments) {
+                let commentsSection = document.createElement('div');
+                commentsSection.className = "post-comments-section";
+                commentsSection.innerHTML = `
+                    <div class="comments-list"></div>
+                    <div class="comment-input-area">
+                        <input type="text" placeholder="Écrire un commentaire..." class="comment-input">
+                    </div>
+                `;
+                div.appendChild(commentsSection);
+
+                // Logic Comments
+                let input = commentsSection.querySelector('.comment-input');
+                input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter' && this.value.trim() !== "") {
+                        let list = commentsSection.querySelector('.comments-list');
+                        let commentDiv = document.createElement('div');
+                        commentDiv.className = "comment-item";
+                        // Avatar commentaire (petit)
+                        let commentAvatar = userAvatarUrl ? `<div class="comment-avatar" style="background-image: url('${userAvatarUrl}');"></div>` : `<div class="comment-avatar">👤</div>`;
+
+                        commentDiv.innerHTML = `
+                            ${commentAvatar}
+                            <div class="comment-bubble">
+                                <strong>${username}</strong>
+                                <p>${this.value}</p>
+                            </div>
+                        `;
+                        list.appendChild(commentDiv);
+                        this.value = "";
+                    }
+                });
+            }
 
             document.getElementById('publications').prepend(div);
             this.reset();

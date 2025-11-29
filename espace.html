@@ -43,8 +43,13 @@
                 <p class="Activer">Activer les commentaires</p> 
             </label>                      
             </div> 
-        <div class="fb-post-area"> 
-           <div id="editor" contenteditable="true" class="editor-area">
+        <div class="fb-post-area" style="display: flex; gap: 10px; align-items: flex-start;"> 
+            <div class="user-avatar-container">
+                <div id="current-user-avatar" class="post-avatar" style="cursor: pointer; background: #ddd;" title="Changer photo">👤</div>
+                <input type="file" id="avatar-input" accept="image/*" style="display: none;">
+            </div>
+           <div style="flex-grow: 1;">
+               <div id="editor" contenteditable="true" class="editor-area">
     Exprimez-vous...
 </div>
             <div class="fb-toolbar">
@@ -67,6 +72,8 @@
         </div>
         
         <div id="media-preview"></div>
+        </div>
+        </div>
 
         <button type="submit" class="fb-publish">Publier</button>
     </form>
